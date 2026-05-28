@@ -123,7 +123,8 @@ try{
 
 const response = await fetch(api,{
 headers:{
-Authorization:`token ${token}`
+Authorization:`Bearer ${token}`,
+Accept:"application/vnd.github+json"
 }
 });
 
@@ -133,24 +134,35 @@ let content = atob(data.content);
 
 content = content.replace(oldUrl,newUrl);
 
-const updated = btoa(content);
+const updated = btoa(unescape(encodeURIComponent(content)));
 
-await fetch(api,{
+const upload = await fetch(api,{
 method:"PUT",
 headers:{
-Authorization:`token ${token}`,
+Authorization:`Bearer ${token}`,
+Accept:"application/vnd.github+json",
 "Content-Type":"application/json"
 },
 body:JSON.stringify({
-message:"Channel URL Updated",
+message:"Channel Updated",
 content:updated,
 sha:data.sha
 })
 });
 
-alert("Channel Updated Successfully");
+if(upload.ok){
+
+alert("Update Success");
 
 location.reload();
+
+}else{
+
+alert("GitHub Update Failed");
+
+console.log(await upload.text());
+
+}
 
 }catch(error){
 
