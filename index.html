@@ -6,14 +6,44 @@
 </head>
 
 <body>
+<div id="popup" class="popup">
 
-<div class="title">
-  SHAMIM LIVE TV CHANNEL CONTROL
+<div class="popup-box">
+
+<h2>Channel Information</h2>
+
+<input type="text" id="channelName" placeholder="Channel Name">
+
+<textarea id="channelUrl"
+placeholder="Channel URL"></textarea>
+
+<input type="text" id="channelLogo"
+placeholder="Logo URL">
+
+<div class="popup-buttons">
+
+<button onclick="copyLink()">
+Copy Link
+</button>
+
+<button onclick="copyLogo()">
+Copy Logo
+</button>
+
 </div>
 
-<div id="channels" class="grid"></div>
+<button class="save-btn"
+onclick="saveChannel()">
+SAVE </button>
 
-<script src="app.js"></script>
+<button class="close-btn"
+onclick="closePopup()">
+CLOSE </button>
+
+</div>
+
+</div>
+
 
 </body>
 </html>
