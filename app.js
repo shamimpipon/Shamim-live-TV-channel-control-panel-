@@ -6,7 +6,9 @@ fetch(m3u)
 .then(data => {
 
 const lines = data.split("\n");
-const container = document.getElementById("channels");
+
+const container =
+document.getElementById("channels");
 
 for(let i = 0; i < lines.length; i++){
 
@@ -15,12 +17,13 @@ if(lines[i].startsWith("#EXTINF")){
 const info = lines[i];
 
 const logo =
-info.match(/tvg-logo="(.*?)"/)?.[1];
+info.match(/tvg-logo="(.*?)"/)?.[1] || "";
 
 const name =
-info.split(",")[1];
+info.split(",")[1] || "No Name";
 
-const url = lines[i+1];
+const url =
+(lines[i+1] || "").trim();
 
 container.innerHTML += `
 
@@ -28,8 +31,8 @@ container.innerHTML += `
 
 <button class="edit"
 onclick="editChannel('${url}','${name}','${logo}')">
-Edit
-</button>
+EDIT </button>
+
 <img src="${logo}">
 
 <div class="name">
@@ -46,18 +49,68 @@ ${name}
 
 });
 
-function editChannel(oldUrl){
+let currentOldUrl = "";
+
+/* OPEN POPUP */
+
+function editChannel(url,name="",logo=""){
+
+currentOldUrl = url;
+
+document.getElementById("popup").style.display="flex";
+
+document.getElementById("channelName").value=name;
+
+document.getElementById("channelUrl").value=url;
+
+document.getElementById("channelLogo").value=logo;
+
+}
+
+/* CLOSE POPUP */
+
+function closePopup(){
+
+document.getElementById("popup").style.display="none";
+
+}
+
+/* COPY LINK */
+
+function copyLink(){
+
+navigator.clipboard.writeText(
+document.getElementById("channelUrl").value
+);
+
+alert("Link Copied");
+
+}
+
+/* COPY LOGO */
+
+function copyLogo(){
+
+navigator.clipboard.writeText(
+document.getElementById("channelLogo").value
+);
+
+alert("Logo Copied");
+
+}
+
+/* SAVE */
+
+function saveChannel(){
 
 const newUrl =
-prompt("Enter New URL", oldUrl);
+document.getElementById("channelUrl").value;
 
-if(newUrl){
-
-alert(newUrl);
+updateGithub(currentOldUrl,newUrl);
 
 }
 
-}
+/* UPDATE GITHUB */
 
 async function updateGithub(oldUrl,newUrl){
 
@@ -108,54 +161,3 @@ console.log(error);
 }
 
 }
-let currentOldUrl = "";
-
-function editChannel(url,name="",logo=""){
-
-currentOldUrl = url;
-
-document.getElementById("popup").style.display="flex";
-
-document.getElementById("channelName").value=name;
-
-document.getElementById("channelUrl").value=url;
-
-document.getElementById("channelLogo").value=logo;
-
-}
-
-function closePopup(){
-
-document.getElementById("popup").style.display="none";
-
-}
-
-function copyLink(){
-
-navigator.clipboard.writeText(
-document.getElementById("channelUrl").value
-);
-
-alert("Link Copied");
-
-}
-
-function copyLogo(){
-
-navigator.clipboard.writeText(
-document.getElementById("channelLogo").value
-);
-
-alert("Logo Copied");
-
-}
-
-function saveChannel(){
-
-const newUrl =
-document.getElementById("channelUrl").value;
-
-updateGithub(currentOldUrl,newUrl);
-
-}
-
