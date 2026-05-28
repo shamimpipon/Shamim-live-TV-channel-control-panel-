@@ -27,7 +27,7 @@ container.innerHTML += `
 <div class="card">
 
 <button class="edit"
-onclick='editChannel(`${url}`)'>
+onclick='editChannel(`${url}`,`${name}`,`${logo}`)'
 Edit
 </button>
 <img src="${logo}">
@@ -108,3 +108,54 @@ console.log(error);
 }
 
 }
+let currentOldUrl = "";
+
+function editChannel(url,name="",logo=""){
+
+currentOldUrl = url;
+
+document.getElementById("popup").style.display="flex";
+
+document.getElementById("channelName").value=name;
+
+document.getElementById("channelUrl").value=url;
+
+document.getElementById("channelLogo").value=logo;
+
+}
+
+function closePopup(){
+
+document.getElementById("popup").style.display="none";
+
+}
+
+function copyLink(){
+
+navigator.clipboard.writeText(
+document.getElementById("channelUrl").value
+);
+
+alert("Link Copied");
+
+}
+
+function copyLogo(){
+
+navigator.clipboard.writeText(
+document.getElementById("channelLogo").value
+);
+
+alert("Logo Copied");
+
+}
+
+function saveChannel(){
+
+const newUrl =
+document.getElementById("channelUrl").value;
+
+updateGithub(currentOldUrl,newUrl);
+
+}
+
