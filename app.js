@@ -27,9 +27,9 @@ container.innerHTML += `
 <div class="card">
 
 <button class="edit"
-onclick="editChannel('${url}')">
-Edit </button>
-
+onclick='editChannel(`${url}`)'>
+Edit
+</button>
 <img src="${logo}">
 
 <div class="name">
@@ -51,9 +51,9 @@ function editChannel(oldUrl){
 const newUrl =
 prompt("Enter New URL", oldUrl);
 
-if(newUrl && newUrl !== oldUrl){
+if(newUrl){
 
-updateGithub(oldUrl,newUrl);
+alert(newUrl);
 
 }
 
