@@ -114,7 +114,7 @@ updateGithub(currentOldUrl,newUrl);
 
 async function updateGithub(oldUrl,newUrl){
 
-const token = "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";
+const token = "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";
 
 const api =
 "https://api.github.com/repos/shamimpipon/Shamim-live-tv/contents/Channel.m3u";
