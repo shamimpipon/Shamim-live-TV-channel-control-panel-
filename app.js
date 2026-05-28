@@ -27,7 +27,7 @@ container.innerHTML += `
 <div class="card">
 
 <button class="edit"
-onclick='editChannel(`${url}`,`${name}`,`${logo}`)''
+onclick="editChannel('${url}','${name}','${logo}')">
 Edit
 </button>
 <img src="${logo}">
