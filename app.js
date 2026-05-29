@@ -139,7 +139,8 @@ Accept:"application/vnd.github.v3+json"
 
 const data = await response.json();
 
-console.log(data);
+console.log(response.status);
+console.log(data);;
 
 if(!data.content){
 
