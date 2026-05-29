@@ -1,6 +1,5 @@
 const m3u =
-"https://raw.githubusercontent.com/shamimpipon/repo1/master/Channel.m3u";
-fetch(m3u)
+"https://raw.githubusercontent.com/shamimpipon/Shamim-live-tv/main/Channel.m3u";fetch(m3u)
 .then(res => res.text())
 .then(data => {
 
@@ -118,8 +117,7 @@ async function updateGithub(oldUrl,newUrl){
 const token = "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";
 
 const api =
-"https://api.github.com/repo1/shamimpipon/Shamim-live-tv/contents/Channel.m3u";
-
+"https://api.github.com/repos/shamimpipon/Shamim-live-tv/contents/Channel.m3u";
 try{
 
 const response = await fetch(api,{
