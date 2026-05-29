@@ -1,8 +1,6 @@
 const m3u =
 "https://raw.githubusercontent.com/shamimpipon/Shamim-live-tv/main/Channel.m3u";
 
-/* LOAD CHANNELS */
-
 fetch(m3u)
 .then(res => res.text())
 .then(data => {
@@ -11,8 +9,6 @@ const lines = data.split("\n");
 
 const container =
 document.getElementById("channels");
-
-container.innerHTML = "";
 
 for(let i = 0; i < lines.length; i++){
 
@@ -29,27 +25,13 @@ info.split(",")[1] || "No Name";
 const url =
 (lines[i+1] || "").trim();
 
-/* SAFE URL */
-
-const safeUrl =
-encodeURIComponent(url);
-
-const safeName =
-encodeURIComponent(name);
-
-const safeLogo =
-encodeURIComponent(logo);
-
 container.innerHTML += `
 
 <div class="card">
 
 <button class="edit"
-data-url="${encodeURIComponent(url)}"
-data-name="${encodeURIComponent(name)}"
-data-logo="${encodeURIComponent(logo)}">
-EDIT
-</button>
+onclick="editChannel('${url}','${name}','${logo}')">
+EDIT </button>
 
 <img src="${logo}">
 
@@ -60,41 +42,10 @@ ${name}
 </div>
 
 `;
-  document.addEventListener("click",function(e){
-
-if(e.target.classList.contains("edit")){
-
-const url =
-decodeURIComponent(
-e.target.dataset.url
-);
-
-const name =
-decodeURIComponent(
-e.target.dataset.name
-);
-
-const logo =
-decodeURIComponent(
-e.target.dataset.logo
-);
-
-editChannel(url,name,logo);
-
-}
-
-});
 
 }
 
 }
-
-})
-.catch(error=>{
-
-console.log(error);
-
-alert("M3U Load Failed");
 
 });
 
@@ -116,7 +67,7 @@ document.getElementById("channelLogo").value=logo;
 
 }
 
-/* CLOSE */
+/* CLOSE POPUP */
 
 function closePopup(){
 
@@ -171,48 +122,35 @@ const api =
 try{
 
 const response = await fetch(api,{
-method:"GET",
 headers:{
-Authorization:`token ${token}`,
-Accept:"application/vnd.github.v3+json"
+Authorization:`Bearer ${token}`,
+Accept:"application/vnd.github+json"
 }
 });
 
 const data = await response.json();
 
-if(!data.content){
-
-alert("File Load Failed");
-
-console.log(data);
-
-return;
-
-}
-
 let content = atob(data.content);
 
 content = content.replace(oldUrl,newUrl);
 
+const updated = btoa(unescape(encodeURIComponent(content)));
+
 const upload = await fetch(api,{
 method:"PUT",
 headers:{
-Authorization:`token ${token}`,
-Accept:"application/vnd.github.v3+json",
+Authorization:`Bearer ${token}`,
+Accept:"application/vnd.github+json",
 "Content-Type":"application/json"
 },
 body:JSON.stringify({
 message:"Channel Updated",
-content:btoa(content),
+content:updated,
 sha:data.sha
 })
 });
 
-const result = await upload.json();
-
-console.log(result);
-
-if(result.commit){
+if(upload.ok){
 
 alert("Update Success");
 
@@ -220,20 +158,18 @@ location.reload();
 
 }else{
 
-alert("Update Failed");
+alert("GitHub Update Failed");
 
-console.log(result);
+console.log(await upload.text());
 
 }
 
 }catch(error){
 
+alert("Update Failed");
+
 console.log(error);
 
-alert("Error");
-
 }
 
 }
-```
-
