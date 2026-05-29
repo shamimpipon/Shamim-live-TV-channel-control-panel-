@@ -105,6 +105,8 @@ function saveChannel(){
 const newUrl =
 document.getElementById("channelUrl").value;
 
+console.log("SAVE CLICK");
+
 updateGithub(currentOldUrl,newUrl);
 
 }
