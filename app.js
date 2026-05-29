@@ -116,41 +116,64 @@ async function updateGithub(oldUrl,newUrl){
 
 const token = "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";
 
+const owner = "shamimpipon";
+
+const repo = "Shamim-live-tv";
+
+const path = "Channel.m3u";
+
 const api =
-"https://api.github.com/repos/shamimpipon/Shamim-live-tv/contents/Channel.m3u";
+`https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
 
 try{
 
+/* GET FILE */
+
 const response = await fetch(api,{
+method:"GET",
 headers:{
-Authorization:`Bearer ${token}`,
-Accept:"application/vnd.github+json"
+Authorization:`token ${token}`,
+Accept:"application/vnd.github.v3+json"
 }
 });
 
 const data = await response.json();
 
+console.log(data);
+
+if(!data.content){
+
+alert("File Load Failed");
+
+return;
+
+}
+
 let content = atob(data.content);
 
 content = content.replace(oldUrl,newUrl);
 
-const updated = btoa(unescape(encodeURIComponent(content)));
+/* UPDATE FILE */
 
 const upload = await fetch(api,{
 method:"PUT",
 headers:{
-Authorization:`Bearer ${token}`,
-Accept:"application/vnd.github+json",
+Authorization:`token ${token}`,
+Accept:"application/vnd.github.v3+json",
 "Content-Type":"application/json"
 },
 body:JSON.stringify({
 message:"Channel Updated",
-content:updated,
+content:btoa(content),
 sha:data.sha
 })
 });
 
-if(upload.ok){
+const result = await upload.json();
+
+console.log(result);
+
+if(result.commit){
 
 alert("Update Success");
 
@@ -158,18 +181,18 @@ location.reload();
 
 }else{
 
-alert("GitHub Update Failed");
+alert("Update Failed");
 
-console.log(await upload.text());
+console.log(result);
 
 }
 
 }catch(error){
 
-alert("Update Failed");
-
 console.log(error);
 
-}
+alert("Error");
 
 }
+
+  }
