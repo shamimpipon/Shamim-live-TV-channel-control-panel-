@@ -1,199 +1,117 @@
-const m3u =
-"https://raw.githubusercontent.com/shamimpipon/Shamim-live-tv/main/Channel.m3u";
+const m3u = "https://raw.githubusercontent.com/shamimpipon/Shamim-live-tv/main/Channel.m3u";
+
+// Base64 ডিকোডিং এর জন্য ফাংশন
+function decodeBase64(str) {
+    return decodeURIComponent(atob(str).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+}
 
 fetch(m3u)
-.then(res => res.text())
-.then(data => {
+    .then(res => res.text())
+    .then(data => {
+        const lines = data.split("\n");
+        const container = document.getElementById("channels");
+        let htmlContent = ""; // পারফরম্যান্সের জন্য স্ট্রিং ব্যবহার করছি
 
-const lines = data.split("\n");
+        for (let i = 0; i < lines.length; i++) {
+            if (lines[i].startsWith("#EXTINF")) {
+                const info = lines[i];
+                const logo = info.match(/tvg-logo="(.*?)"/)?.[1] || "";
+                const name = info.split(",")[1] || "No Name";
+                const url = (lines[i + 1] || "").trim();
 
-const container =
-document.getElementById("channels");
-
-for(let i = 0; i < lines.length; i++){
-
-if(lines[i].startsWith("#EXTINF")){
-
-const info = lines[i];
-
-const logo =
-info.match(/tvg-logo="(.*?)"/)?.[1] || "";
-
-const name =
-info.split(",")[1] || "No Name";
-
-const url =
-(lines[i+1] || "").trim();
-
-container.innerHTML += `
-
-<div class="card">
-
-<button class="edit"
-onclick="editChannel('${url}','${name}','${logo}')">
-EDIT </button>
-
-<img src="${logo}">
-
-<div class="name">
-${name}
-</div>
-
-</div>
-
-`;
-
-}
-
-}
-
-});
+                htmlContent += `
+                <div class="card">
+                    <button class="edit" onclick="editChannel('${url}','${name}','${logo}')">EDIT</button>
+                    <img src="${logo}">
+                    <div class="name">${name}</div>
+                </div>`;
+            }
+        }
+        container.innerHTML = htmlContent;
+    })
+    .catch(err => {
+        console.error("Fetch Error:", err);
+        alert("প্রাথমিক লিস্ট লোড করতে ব্যর্থ হয়েছে। ইন্টারনেট সংযোগ চেক করুন।");
+    });
 
 let currentOldUrl = "";
 
-/* OPEN POPUP */
-
-function editChannel(url,name="",logo=""){
-
-currentOldUrl = url;
-
-document.getElementById("popup").style.display="flex";
-
-document.getElementById("channelName").value=name;
-
-document.getElementById("channelUrl").value=url;
-
-document.getElementById("channelLogo").value=logo;
-
+function editChannel(url, name = "", logo = "") {
+    currentOldUrl = url;
+    document.getElementById("popup").style.display = "flex";
+    document.getElementById("channelName").value = name;
+    document.getElementById("channelUrl").value = url;
+    document.getElementById("channelLogo").value = logo;
 }
 
-/* CLOSE POPUP */
-
-function closePopup(){
-
-document.getElementById("popup").style.display="none";
-
+function closePopup() {
+    document.getElementById("popup").style.display = "none";
 }
 
-/* COPY LINK */
-
-function copyLink(){
-
-navigator.clipboard.writeText(
-document.getElementById("channelUrl").value
-);
-
-alert("Link Copied");
-
+function copyLink() {
+    navigator.clipboard.writeText(document.getElementById("channelUrl").value);
+    alert("Link Copied");
 }
 
-/* COPY LOGO */
-
-function copyLogo(){
-
-navigator.clipboard.writeText(
-document.getElementById("channelLogo").value
-);
-
-alert("Logo Copied");
-
+function copyLogo() {
+    navigator.clipboard.writeText(document.getElementById("channelLogo").value);
+    alert("Logo Copied");
 }
 
-/* SAVE */
-
-function saveChannel(){
-
-const newUrl =
-document.getElementById("channelUrl").value;
-
-updateGithub(currentOldUrl,newUrl);
-
+function saveChannel() {
+    const newUrl = document.getElementById("channelUrl").value;
+    updateGithub(currentOldUrl, newUrl);
 }
 
-/* UPDATE GITHUB */
+async function updateGithub(oldUrl, newUrl) {
+    const token = "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"; // এখানে টোকেন দিন
+    const owner = "shamimpipon";
+    const repo = "Shamim-live-tv";
+    const path = "Channel.m3u";
+    const api = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
 
-async function updateGithub(oldUrl,newUrl){
+    try {
+        // ১. ফাইল রিড করা
+        const response = await fetch(api, {
+            method: "GET",
+            headers: { Authorization: `token ${token}`, Accept: "application/vnd.github.v3+json" }
+        });
 
-const token = "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";
+        if (!response.ok) throw new Error("ফাইলটি GitHub থেকে লোড করা সম্ভব হয়নি।");
 
-const owner = "shamimpipon";
+        const data = await response.json();
+        let content = decodeBase64(data.content);
+        
+        // ২. ফাইল আপডেট করা
+        content = content.replace(oldUrl, newUrl);
 
-const repo = "Shamim-live-tv";
+        // ৩. GitHub-এ পুশ করা
+        const upload = await fetch(api, {
+            method: "PUT",
+            headers: {
+                Authorization: `token ${token}`,
+                Accept: "application/vnd.github.v3+json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: "Channel Updated via Panel",
+                content: btoa(unescape(encodeURIComponent(content))),
+                sha: data.sha
+            })
+        });
 
-const path = "Channel.m3u";
-
-const api =
-`https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-
-try{
-
-/* GET FILE */
-
-const response = await fetch(api,{
-method:"GET",
-headers:{
-Authorization:`token ${token}`,
-Accept:"application/vnd.github.v3+json"
-}
-});
-
-const data = await response.json();
-
-console.log(response.status);
-console.log(data);;
-
-if(!data.content){
-
-alert("File Load Failed");
-
-return;
-
-}
-
-let content = atob(data.content);
-
-content = content.replace(oldUrl,newUrl);
-
-/* UPDATE FILE */
-
-const upload = await fetch(api,{
-method:"PUT",
-headers:{
-Authorization:`token ${token}`,
-Accept:"application/vnd.github.v3+json",
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-message:"Channel Updated",
-content:btoa(content),
-sha:data.sha
-})
-});
-
-const result = await upload.json();
-
-console.log(result);
-
-if(result.commit){
-
-alert("Update Success");
-
-location.reload();
-
-}else{
-
-alert("Update Failed");
-
-console.log(result);
-
+        const result = await upload.json();
+        if (result.commit) {
+            alert("Update Success!");
+            location.reload();
+        } else {
+            alert("Update Failed: " + (result.message || "Unknown error"));
+        }
+    } catch (error) {
+        console.error(error);
+        alert("Error: " + error.message);
+    }
 }
 
-}catch(error){
-
-console.log(error);
-
-alert("Error");
-
-}
-
-}
