@@ -67,11 +67,12 @@ function saveChannel() {
 
 async function updateGithub(oldUrl, newUrl) {
     const token = "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"; // এখানে টোকেন দিন
-    const owner = "shamimpipon";
-    const repo = "Shamim-live-tv";
-    const path = "Channel.m3u";
-    const api = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-
+fetch("https://api.github.com/repos/shamimpipon/Shamim-live-tv/contents/Channel.m3u", {
+    headers: { "Authorization": `token ${token}` }
+})
+.then(res => res.json())
+.then(data => console.log(data))
+.catch(err => console.error(err));
     try {
         // ১. ফাইল রিড করা
         const response = await fetch(api, {
