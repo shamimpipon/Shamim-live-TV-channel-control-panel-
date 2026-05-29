@@ -1,4 +1,3 @@
-```js
 const m3u =
 "https://raw.githubusercontent.com/shamimpipon/Shamim-live-tv/main/Channel.m3u";
 
