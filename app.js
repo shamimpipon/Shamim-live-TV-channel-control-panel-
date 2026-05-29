@@ -123,7 +123,7 @@ const repo = "Shamim-live-tv";
 const path = "Channel.m3u";
 
 const api =
-`https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+"https://api.github.com/repos/shamimpipon/Shamim-live-tv/contents/Channel.m3u";}`;
 
 try{
 
