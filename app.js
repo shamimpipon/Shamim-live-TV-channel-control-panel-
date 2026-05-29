@@ -45,16 +45,13 @@ container.innerHTML += `
 <div class="card">
 
 <button class="edit"
-onclick="editChannel(
-decodeURIComponent('${safeUrl}'),
-decodeURIComponent('${safeName}'),
-decodeURIComponent('${safeLogo}')
-)">
+data-url="${encodeURIComponent(url)}"
+data-name="${encodeURIComponent(name)}"
+data-logo="${encodeURIComponent(logo)}">
 EDIT
 </button>
 
-<img src="${logo}"
-onerror="this.src='https://via.placeholder.com/150'">
+<img src="${logo}">
 
 <div class="name">
 ${name}
@@ -63,6 +60,30 @@ ${name}
 </div>
 
 `;
+  document.addEventListener("click",function(e){
+
+if(e.target.classList.contains("edit")){
+
+const url =
+decodeURIComponent(
+e.target.dataset.url
+);
+
+const name =
+decodeURIComponent(
+e.target.dataset.name
+);
+
+const logo =
+decodeURIComponent(
+e.target.dataset.logo
+);
+
+editChannel(url,name,logo);
+
+}
+
+});
 
 }
 
