@@ -1,6 +1,8 @@
 const m3u =
 "https://raw.githubusercontent.com/shamimpipon/Shamim-live-tv/main/Channel.m3u";
 
+/* LOAD CHANNELS */
+
 fetch(m3u)
 .then(res => res.text())
 .then(data => {
@@ -9,6 +11,8 @@ const lines = data.split("\n");
 
 const container =
 document.getElementById("channels");
+
+container.innerHTML = "";
 
 for(let i = 0; i < lines.length; i++){
 
@@ -25,15 +29,32 @@ info.split(",")[1] || "No Name";
 const url =
 (lines[i+1] || "").trim();
 
+/* SAFE URL */
+
+const safeUrl =
+encodeURIComponent(url);
+
+const safeName =
+encodeURIComponent(name);
+
+const safeLogo =
+encodeURIComponent(logo);
+
 container.innerHTML += `
 
 <div class="card">
 
 <button class="edit"
-onclick="editChannel('${url}','${name}','${logo}')">
-EDIT </button>
+onclick="editChannel(
+decodeURIComponent('${safeUrl}'),
+decodeURIComponent('${safeName}'),
+decodeURIComponent('${safeLogo}')
+)">
+EDIT
+</button>
 
-<img src="${logo}">
+<img src="${logo}"
+onerror="this.src='https://via.placeholder.com/150'">
 
 <div class="name">
 ${name}
@@ -46,6 +67,13 @@ ${name}
 }
 
 }
+
+})
+.catch(error=>{
+
+console.log(error);
+
+alert("M3U Load Failed");
 
 });
 
@@ -67,7 +95,7 @@ document.getElementById("channelLogo").value=logo;
 
 }
 
-/* CLOSE POPUP */
+/* CLOSE */
 
 function closePopup(){
 
@@ -116,18 +144,10 @@ async function updateGithub(oldUrl,newUrl){
 
 const token = "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";
 
-const owner = "shamimpipon";
-
-const repo = "Shamim-live-tv";
-
-const path = "Channel.m3u";
-
 const api =
 "https://api.github.com/repos/shamimpipon/Shamim-live-tv/contents/Channel.m3u";
 
 try{
-
-/* GET FILE */
 
 const response = await fetch(api,{
 method:"GET",
@@ -139,11 +159,11 @@ Accept:"application/vnd.github.v3+json"
 
 const data = await response.json();
 
-console.log(data);
-
 if(!data.content){
 
 alert("File Load Failed");
+
+console.log(data);
 
 return;
 
@@ -152,8 +172,6 @@ return;
 let content = atob(data.content);
 
 content = content.replace(oldUrl,newUrl);
-
-/* UPDATE FILE */
 
 const upload = await fetch(api,{
 method:"PUT",
@@ -195,4 +213,6 @@ alert("Error");
 
 }
 
-  }
+}
+```
+
