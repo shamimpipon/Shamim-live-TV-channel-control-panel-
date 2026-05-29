@@ -1,6 +1,5 @@
 const m3u =
-"https://raw.githubusercontent.com/shamimpipon/Shamim-live-tv/main/Channel.m3u";
-
+"https://raw.githubusercontent.com/shamimpipon/repo1/master/Channel.m3u";
 fetch(m3u)
 .then(res => res.text())
 .then(data => {
