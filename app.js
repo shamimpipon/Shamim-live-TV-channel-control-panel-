@@ -1,6 +1,6 @@
 // ১. কনফিগারেরশন এবং গ্লোবাল ভেরিয়েবল
 const m3u = "https://raw.githubusercontent.com/shamimpipon/Shamim-live-tv/main/Channel.m3u";
-const token = "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"; // আপনার টোকেনটি এখানে বসান
+const token = "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"; // আপনার টোকেনটি এখানে বসান
 const owner = "shamimpipon";
 const repo = "Shamim-live-tv";
 const path = "Channel.m3u";
